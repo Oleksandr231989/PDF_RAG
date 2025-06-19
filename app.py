@@ -21,7 +21,7 @@ from streamlit_option_menu import option_menu
 # LangChain imports
 try:
     from langchain.text_splitter import RecursiveCharacterTextSplitter
-    from langchain.embeddings import OpenAIEmbeddings
+    from langchain_openai import OpenAIEmbeddings
     from langchain.vectorstores import Chroma
     from langchain.docstore.document import Document
     from langchain_openai import ChatOpenAI
