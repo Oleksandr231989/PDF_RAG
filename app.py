@@ -1,5 +1,5 @@
 # =============================================================================
-# STREAMLIT PDF RAG APPLICATION
+# STREAMLIT PDF RAG APPLICATION - FIXED VERSION WITH FAISS
 # Web-based PDF Q&A system with visual page retrieval
 # =============================================================================
 
@@ -11,9 +11,9 @@ import io
 from pdf2image import convert_from_path
 import matplotlib.pyplot as plt
 from PIL import Image
-import sqlite3
 import pandas as pd
 from datetime import datetime
+import pickle
 
 # Streamlit imports
 from streamlit_option_menu import option_menu
@@ -22,7 +22,7 @@ from streamlit_option_menu import option_menu
 try:
     from langchain.text_splitter import RecursiveCharacterTextSplitter
     from langchain_openai import OpenAIEmbeddings
-    from langchain.vectorstores import Chroma
+    from langchain.vectorstores import FAISS  # Changed from Chroma to FAISS
     from langchain.docstore.document import Document
     from langchain_openai import ChatOpenAI
     from langchain.chains import RetrievalQA
@@ -85,11 +85,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# STREAMLIT PDF RAG CLASS
+# STREAMLIT PDF RAG CLASS WITH FAISS
 # =============================================================================
 
 class StreamlitPDFRAG:
-    """Streamlit-based PDF RAG system"""
+    """Streamlit-based PDF RAG system using FAISS"""
     
     def __init__(self):
         self.initialize_session_state()
@@ -186,7 +186,7 @@ class StreamlitPDFRAG:
         return chunks
     
     def create_vector_database(self, chunks, api_key):
-        """Create vector database with embeddings"""
+        """Create FAISS vector database with embeddings"""
         try:
             # Initialize embeddings
             embeddings = OpenAIEmbeddings(
@@ -208,11 +208,10 @@ class StreamlitPDFRAG:
                 )
                 documents.append(doc)
             
-            # Create vector database
-            vector_db = Chroma.from_documents(
+            # Create FAISS vector database
+            vector_db = FAISS.from_documents(
                 documents=documents,
-                embedding=embeddings,
-                persist_directory=f"./vectordb_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                embedding=embeddings
             )
             
             return vector_db
@@ -289,7 +288,7 @@ Answer:"""
             return []
 
 # =============================================================================
-# STREAMLIT APP INTERFACE
+# STREAMLIT APP INTERFACE (Same as before)
 # =============================================================================
 
 def main():
@@ -583,7 +582,7 @@ def about_section():
     - **Frontend**: Streamlit
     - **AI Model**: OpenAI GPT-4o Mini
     - **Embeddings**: OpenAI text-embedding-3-small
-    - **Vector Database**: ChromaDB
+    - **Vector Database**: FAISS (Facebook AI Similarity Search)
     - **PDF Processing**: PyPDF2, pdf2image
     - **Text Processing**: LangChain
     
@@ -614,29 +613,6 @@ def about_section():
     
     st.markdown("---")
     st.markdown("**Built with ❤️ using Streamlit and OpenAI**")
-
-# =============================================================================
-# REQUIREMENTS.TXT CONTENT
-# =============================================================================
-
-def show_requirements():
-    """Show requirements.txt content"""
-    requirements = """
-streamlit==1.28.0
-streamlit-option-menu==0.3.6
-langchain==0.0.354
-langchain-openai==0.0.2
-langchain-community==0.0.10
-chromadb==0.4.18
-pypdf2==3.0.1
-pdf2image==1.16.3
-openai==1.3.7
-python-dotenv==1.0.0
-matplotlib==3.7.2
-pillow==10.0.1
-pandas==2.0.3
-"""
-    return requirements
 
 # =============================================================================
 # RUN THE APP
